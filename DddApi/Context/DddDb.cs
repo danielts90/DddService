@@ -15,7 +15,12 @@ public class DddDb : DbContext
         builder.Entity<Ddd>()
             .ToTable("ddd") 
             .HasKey(c => c.Id);
-        
+
+
+        builder.Entity<Ddd>()
+        .Property(c => c.Id)
+        .ValueGeneratedOnAdd();
+
         builder.Entity<Ddd>()
             .Property(c => c.Code)
             .IsRequired()

@@ -26,9 +26,9 @@ namespace DDDIntegrationTest
                 if (!dbContext.Ddds.Any())
                 {
                     dbContext.Ddds.AddRange(
-                        new Ddd { Id = 1, Code = "11", RegiaoId = 1 },
-                        new Ddd { Id = 2, Code = "22", RegiaoId = 1 },
-                        new Ddd { Id = 3, Code = "33", RegiaoId = 1 }
+                        new Ddd { Code = "11", RegiaoId = 1 },
+                        new Ddd { Code = "22", RegiaoId = 1 },
+                        new Ddd { Code = "33", RegiaoId = 1 }
                     );
                     dbContext.SaveChanges();
                 }
@@ -42,15 +42,19 @@ namespace DDDIntegrationTest
         {
             builder.ConfigureServices(services =>
             {
-                var descriptor = services.SingleOrDefault(d => d.ServiceType == typeof(DbContextOptions<DddDb>));
-                if (descriptor != null)
+                builder.ConfigureServices(services =>
                 {
-                    services.Remove(descriptor);
-                }
+                    var descriptor = services.SingleOrDefault(d => d.ServiceType == typeof(DbContextOptions<DddDb>));
+                    if (descriptor != null)
+                    {
+                        services.Remove(descriptor);
+                    }
 
-                services.AddDbContext<DddDb>(options =>
-                {
-                    options.UseInMemoryDatabase("InMemoryTestDb");
+                    services.AddDbContext<DddDb>(options =>
+                    {
+                        var connectionString = "Host=localhost;Database=DddTestDb;Username=techuser;Password=techpassword";
+                        options.UseNpgsql(connectionString);
+                    });
                 });
 
                 services.AddSingleton<IMessageProducer>(provider => new Producer("test.ddd.updated"));
